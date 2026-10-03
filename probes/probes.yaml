@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: legacy-app
+  name: legacy-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: legacy-app
+  template:
+    metadata:
+      labels:
+        app: legacy-app
+    spec:
+      containers:
+      - image: busybox:stable
+        name: busybox
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            echo "Booting..."
+            sleep 25
+            touch /tmp/started
+            touch /tmp/ready
+            sleep 3600
+        startupProbe:
+          exec:
+            command:
+              - cat
+              - /tmp/started
+          failureThreshold: 10
+          periodSeconds: 5
+        livenessProbe: 
+          exec:
+            command:
+              - cat
+              - /tmp/started
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+              - cat
+              - /tmp/ready
+          periodSeconds: 5
