@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: Job
+metadata: 
+  name: batch-processor
+  labels:
+    app: batch-processor
+  namespace: data-processing
+spec:
+  completions: 10
+  parallelism: 5
+  template:
+    spec:
+      containers:
+        - name: busybox
+          image: busybox:stable
+          command: ["/bin/sh", "-c", "until wget -q -O- http://db-svc; do sleep 1; done; echo 'Batch Processed'"]
+      restartPolicy: Never

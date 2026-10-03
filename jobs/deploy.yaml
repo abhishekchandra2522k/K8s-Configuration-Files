@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: database
+  name: internal-db
+  namespace: data-processing
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: internal-db
+  template:
+    metadata:
+      labels:
+        app: internal-db
+    spec:
+      containers:
+      - image: nginx:stable
+        name: nginx
+        ports:
+        - containerPort: 80
