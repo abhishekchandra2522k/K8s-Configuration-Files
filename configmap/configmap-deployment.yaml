@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: cm-secret-lab
+data:
+  log_level: DEBUG
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: demo-env
+  name: demo-env-app
+  namespace: cm-secret-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-env
+  template:
+    metadata:
+      labels:
+        app: demo-env
+    spec:
+      containers:
+      - image: busybox
+        name: busybox
+        command: ['sh', '-c', 'sleep 3000']
+        
+        env:
+          - name: LOG_LEVEL
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: log_level
