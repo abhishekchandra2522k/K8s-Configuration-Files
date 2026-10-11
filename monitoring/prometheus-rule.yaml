@@ -1,0 +1,28 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: sample-app-alerts
+  namespace: monitoring
+  labels:
+    release: kps
+spec:
+  groups:
+    - name: sample-app.rules
+      rules:
+        - alert: SampleAppDown
+          expr: absent(up{job="sample-app"}) OR up{job="sample-app"} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Sample app is unreachable"
+            description: "Instance {{ $labels.instance }} has been down for more than 1 minute"
+
+        - alert: SampleAppHighRequestRate
+          expr: rate(http_requests_total[1m]) > 0.5
+          for: 30s
+          labels:
+            severity: warning
+          annotations:
+            summary: "Sample app is receiving high traffic"
+            description: "Request rate on {{ $labels.instance }} has exceeded 0.5 req/s"
