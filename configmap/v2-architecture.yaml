@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prod-config-v2
+  namespace: immutable-lab
+data:
+  db_url: "v2.database.local"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-server
+  namespace: immutable-lab
+  labels:
+    app: api-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-server
+  template:
+    metadata:
+      labels:
+        app: api-server
+    spec:
+      containers:
+      - name: api-pod
+        image: busybox
+        command: ["/bin/sh", "-c", "while true; do sleep 3600; done"]
+        env:
+        - name: DB_URL
+          valueFrom:
+            configMapKeyRef:
+              name: prod-config-v2
+              key: db_url
